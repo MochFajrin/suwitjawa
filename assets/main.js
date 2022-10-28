@@ -1,59 +1,66 @@
 function generateComp() {
     const comp = Math.random();
-    if (comp < 0.3) {
+    if (comp > 0 && comp < 0.3) {
         return 'batu';
     }
-    if (comp < 0.6) {
-        return 'kertas';
+    if (comp > 0.3 && comp < 0.6) {
+        return 'kertas'
     }
-    return 'gunting'
+    return 'gunting';
 }
 
-function getResult(player, comp) {
-    if (player == comp) return 'Seri';
-    if (player == 'batu') return (comp == 'gunting') ? 'Menang' : 'Kalah';
-    if (player == 'gunting') return (comp == 'kertas') ? "Menang" : "Kalah";
-    if (player == 'kertas') return (comp == 'batu') ? "Menang" : "Kalah";
-    return 'bukan pilihan';
+function matchResult(p, comp) {
+    if (p === comp) return 'seri';
+    if (p === 'batu') return (comp === 'gunting') ? 'menang' : 'kalah';
+    if (p === 'kertas') return (comp == 'batu') ? 'menang' : 'kalah';
+    if (p === 'gunting') return (comp == 'kertas') ? 'menang' : 'kalah';
 }
 
-function imgComp(comp){
-    const imgComp = document.getElementsByTagName('img')[0];
-    imgComp.setAttribute('src',`css/${comp}.jpg`)
+function compShake() {
+    const img = document.getElementById('compResult');
+    const arrComp = ['batu', 'kertas', 'gunting'];
+    let start = 0;
+    const timeStart = new Date().getTime();
+
+    setInterval(() => {
+
+        if(new Date().getTime() - timeStart >= 1000){
+            return clearInterval();
+        }
+        console.log(`css/${arrComp[start]}.jpg`);
+        img.setAttribute('src', `css/${arrComp[start++]}.jpg`)
+        if (start >= arrComp.length) {
+            start = 0;
+        }
+
+    }, 100)
 }
-function showResult(result){
-    const textResult = document.getElementsByClassName('container-result')[0];
-    textResult.innerHTML = `<h1>${result}</h1>`;
+
+function setImg(comp){
+    document.getElementById('compResult').setAttribute('src',`css/${comp}.jpg`)
 }
-const batu = document.getElementsByClassName('card batu')[0];
 
-batu.addEventListener('click', () => {
-    const comp = generateComp();
-    const p = 'batu'
-    const result = getResult(p, comp);
-    imgComp(comp);
-    showResult(result);
-    console.log(`Player : ${p}\nComp : ${comp}\nHasil : ${result}`);
-})
+function showResults(result){
+    document.getElementById('container-result').innerHTML = `<h1>${result}</h1>`;
+}
 
-const gunting = document.getElementsByClassName('card gunting')[0];
+const contPlayer = document.getElementById('container-player');
+const pBtn = contPlayer.querySelectorAll('img');
 
-gunting.addEventListener('click', () => {
-    const comp = generateComp();
-    const p = 'gunting'
-    const result = getResult(p, comp);
-    imgComp(comp);
-    showResult(result);
-    console.log(`Player : ${p}\nComp : ${comp}\nHasil : ${result}`);
-})
+pBtn.forEach((e) => {
+    e.addEventListener('click', () => {
+        const p = e.id;
+        const comp = generateComp();
+        
 
-const kertas = document.getElementsByClassName('card kertas')[0];
+        compShake();
 
-kertas.addEventListener('click', () => {
-    const comp = generateComp();
-    const p = 'kertas'
-    const result = getResult(p, comp);
-    imgComp(comp);
-    showResult(result);
-    console.log(`Player : ${p}\nComp : ${comp}\nHasil : ${result}`);
+        setTimeout(()=>{
+            const result = matchResult(p,comp);
+            setImg(comp)
+            showResults(result);
+            console.log(`${p} vs ${comp} : ${result}`);
+        },1000);
+        
+    })
 })
